@@ -173,5 +173,18 @@ class RsControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void should_not_add_when_keyWord_is_null() throws Exception {
+        User user = new User("zhangSan", "male", 25, "666@twuc.com", "18800000000");
+        RsEvent rsEvent = new RsEvent("林俊杰发新歌了！", null, user);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String rsString = objectMapper.writeValueAsString(rsEvent);
+
+        mockMvc.perform(post("/rs/event")
+                .content(rsString)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
 
 }
