@@ -73,4 +73,16 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void should_not_register_when_age_is_null() throws Exception {
+        User user = new User("zoom", "female", null, "123@twuc.com", "18888888888");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userStr = objectMapper.writeValueAsString(user);
+        mockMvc.perform(post("/user/register")
+                .content(userStr)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
 }
