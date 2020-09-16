@@ -89,8 +89,12 @@ class RsControllerTest {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         objectMapper.writerWithView(RsEvent.WithUserView.class).writeValue(bos, rsEvent);
 
-        mockMvc.perform(post("/rs/event").content(bos.toString()).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/rs/event")
+                .content(bos.toString())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(header().string("index", "3"))
                 .andExpect(status().isCreated());
+
         mockMvc.perform(get("/rs/list"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(4)))
@@ -233,6 +237,7 @@ class RsControllerTest {
         mockMvc.perform(post("/rs/event")
                 .content(bos.toString())
                 .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(header().string("index", "3"))
                 .andExpect(status().isCreated());
 
         assertEquals(1, UserController.userList.size());
@@ -250,6 +255,7 @@ class RsControllerTest {
         mockMvc.perform(post("/rs/event")
                 .content(bos.toString())
                 .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(header().string("index", "3"))
                 .andExpect(status().isCreated());
 
         RsEvent rsEventNew = new RsEvent("研究说明晚睡会秃头！!", "生活", user);
@@ -258,6 +264,7 @@ class RsControllerTest {
         mockMvc.perform(post("/rs/event")
                 .content(bos.toString())
                 .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(header().string("index", "4"))
                 .andExpect(status().isCreated());
 
         assertEquals(1, UserController.userList.size());

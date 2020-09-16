@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -27,6 +28,7 @@ class UserControllerTest {
         mockMvc.perform(post("/user/register")
                 .content(userStr)
                 .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(header().string("index", String.valueOf(UserController.userList.size() - 1)))
                 .andExpect(status().isCreated());
     }
 
