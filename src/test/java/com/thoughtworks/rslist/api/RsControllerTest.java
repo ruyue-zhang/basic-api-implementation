@@ -1,5 +1,6 @@
 package com.thoughtworks.rslist.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.dto.RsEvent;
 import com.thoughtworks.rslist.dto.User;
@@ -144,5 +145,18 @@ class RsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.eventName", is("第三条event")))
                 .andExpect(jsonPath("$.keyWord", is("noClassify")));
+    }
+
+    @Test
+    void should_not_add_when_eventName_is_empty() throws Exception {
+        User user = new User("zhangSan", "male", 25, "666@twuc.com", "18800000000");
+        RsEvent rsEvent = new RsEvent(null, "娱乐", user);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String rsString = objectMapper.writeValueAsString(rsEvent);
+
+        mockMvc.perform(post("/rs/event")
+                .content(rsString)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 }
