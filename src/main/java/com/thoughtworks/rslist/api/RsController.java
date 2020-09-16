@@ -37,7 +37,7 @@ public class RsController {
   }
 
   @PostMapping("/rs/event")
-  public ResponseEntity addRsEvent(@Valid  @RequestBody RsEvent rsEvent) {
+  public ResponseEntity addRsEvent(@RequestBody @Valid RsEvent rsEvent) {
     Boolean isExist = false;
     for (User user : UserController.userList) {
       if (user.getName().equals(rsEvent.getUser().getName())) {

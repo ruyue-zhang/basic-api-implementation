@@ -12,8 +12,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.hasSize;
+import java.io.ByteArrayOutputStream;
+
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -31,10 +32,13 @@ class RsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].eventName", is("第一条事件")))
                 .andExpect(jsonPath("$[0].keyWord", is("无分类")))
+                .andExpect(jsonPath("$[0]", not(hasKey("user"))))
                 .andExpect(jsonPath("$[1].eventName", is("第二条事件")))
                 .andExpect(jsonPath("$[1].keyWord", is("无分类")))
+                .andExpect(jsonPath("$[1]", not(hasKey("user"))))
                 .andExpect(jsonPath("$[2].eventName", is("第三条事件")))
-                .andExpect(jsonPath("$[2].keyWord", is("无分类")));
+                .andExpect(jsonPath("$[2].keyWord", is("无分类")))
+                .andExpect(jsonPath("$[2]", not(hasKey("user"))));
     }
 
     @Test
@@ -42,17 +46,20 @@ class RsControllerTest {
         mockMvc.perform(get("/rs/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.eventName", is("第一条事件")))
-                .andExpect(jsonPath("$.keyWord", is("无分类")));
+                .andExpect(jsonPath("$.keyWord", is("无分类")))
+                .andExpect(jsonPath("$", not(hasKey("user"))));
 
         mockMvc.perform(get("/rs/2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.eventName", is("第二条事件")))
-                .andExpect(jsonPath("$.keyWord", is("无分类")));
+                .andExpect(jsonPath("$.keyWord", is("无分类")))
+                .andExpect(jsonPath("$", not(hasKey("user"))));
 
         mockMvc.perform(get("/rs/3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.eventName", is("第三条事件")))
-                .andExpect(jsonPath("$.keyWord", is("无分类")));
+                .andExpect(jsonPath("$.keyWord", is("无分类")))
+                .andExpect(jsonPath("$", not(hasKey("user"))));
     }
 
     @Test
@@ -61,10 +68,13 @@ class RsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].eventName", is("第一条事件")))
                 .andExpect(jsonPath("$[0].keyWord", is("无分类")))
+                .andExpect(jsonPath("$[0]", not(hasKey("user"))))
                 .andExpect(jsonPath("$[1].eventName", is("第二条事件")))
                 .andExpect(jsonPath("$[1].keyWord", is("无分类")))
+                .andExpect(jsonPath("$[1]", not(hasKey("user"))))
                 .andExpect(jsonPath("$[2].eventName", is("第三条事件")))
-                .andExpect(jsonPath("$[2].keyWord", is("无分类")));
+                .andExpect(jsonPath("$[2].keyWord", is("无分类")))
+                .andExpect(jsonPath("$[2]", not(hasKey("user"))));
     }
 
     @Test
@@ -76,9 +86,10 @@ class RsControllerTest {
         User user = new User("zhangSan", "male", 25, "666@twuc.com", "18800000000");
         RsEvent rsEvent = new RsEvent("猪肉涨价了", "经济", user);
         ObjectMapper objectMapper = new ObjectMapper();
-        String rsString = objectMapper.writeValueAsString(rsEvent);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        objectMapper.writerWithView(RsEvent.WithoutUserView.class).writeValue(bos, rsEvent);
 
-        mockMvc.perform(post("/rs/event").content(rsString).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/rs/event").content(bos.toString()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
         mockMvc.perform(get("/rs/list"))
                 .andExpect(status().isOk())
@@ -216,10 +227,11 @@ class RsControllerTest {
         User user = new User("zhangSan", "male", 25, "666@twuc.com", "18800000000");
         RsEvent rsEvent = new RsEvent("林俊杰发新歌了!", "娱乐", user);
         ObjectMapper objectMapper = new ObjectMapper();
-        String rsString = objectMapper.writeValueAsString(rsEvent);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        objectMapper.writerWithView(RsEvent.WithoutUserView.class).writeValue(bos, rsEvent);
 
         mockMvc.perform(post("/rs/event")
-                .content(rsString)
+                .content(bos.toString())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
@@ -232,18 +244,19 @@ class RsControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
 
         RsEvent rsEvent = new RsEvent("林俊杰发新歌了!", "娱乐", user);
-        String rsString = objectMapper.writeValueAsString(rsEvent);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        objectMapper.writerWithView(RsEvent.WithoutUserView.class).writeValue(bos, rsEvent);
 
         mockMvc.perform(post("/rs/event")
-                .content(rsString)
+                .content(bos.toString())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
         RsEvent rsEventNew = new RsEvent("研究说明晚睡会秃头！!", "生活", user);
-        String rsStringNew = objectMapper.writeValueAsString(rsEventNew);
+        objectMapper.writerWithView(RsEvent.WithoutUserView.class).writeValue(bos, rsEventNew);
 
         mockMvc.perform(post("/rs/event")
-                .content(rsStringNew)
+                .content(bos.toString())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
