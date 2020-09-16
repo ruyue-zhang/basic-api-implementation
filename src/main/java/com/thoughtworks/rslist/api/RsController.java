@@ -58,9 +58,7 @@ public class RsController {
   }
 
   @PutMapping("/rs/put/{index}")
-  public void updateRsByIndex(@PathVariable int index, @RequestBody String rsEventStr) throws JsonProcessingException {
-    ObjectMapper objectMapper = new ObjectMapper();
-    RsEvent rsEvent = objectMapper.readValue(rsEventStr, RsEvent.class);
+  public void updateRsByIndex(@PathVariable int index, @RequestBody RsEvent rsEvent) {
     String eventName = rsEvent.getEventName() == null ? rsList.get(index - 1).getEventName() : rsEvent.getEventName();
     String keyWord = rsEvent.getKeyWord() == null ? rsList.get(index- 1).getKeyWord() : rsEvent.getKeyWord();
     rsList.set(index - 1, new RsEvent(eventName, keyWord, rsEvent.getUser()));
