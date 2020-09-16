@@ -160,5 +160,18 @@ class RsControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void should_not_add_when_eventName_is_empty() throws Exception {
+        User user = new User("zhangSan", "male", 25, "666@twuc.com", "18800000000");
+        RsEvent rsEvent = new RsEvent("", "娱乐", user);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String rsString = objectMapper.writeValueAsString(rsEvent);
+
+        mockMvc.perform(post("/rs/event")
+                .content(rsString)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
 
 }
