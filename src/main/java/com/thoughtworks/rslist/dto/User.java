@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.*;
-import java.util.Objects;
 
 @Data
 @NoArgsConstructor
@@ -31,23 +30,5 @@ public class User {
         this.age = age;
         this.email = email;
         this.phone = phone;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return Objects.equals(name, user.name) &&
-                Objects.equals(gender, user.gender) &&
-                Objects.equals(age, user.age) &&
-                Objects.equals(email, user.email) &&
-                Objects.equals(phone, user.phone) &&
-                Objects.equals(vote, user.vote);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, gender, age, email, phone, vote);
     }
 }
