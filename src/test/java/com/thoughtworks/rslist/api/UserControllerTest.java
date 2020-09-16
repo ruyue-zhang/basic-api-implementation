@@ -53,6 +53,19 @@ class UserControllerTest {
     }
 
     @Test
+    void should_not_register_when_name_length_more_than_8() throws Exception {
+        User user = new User("administration", "female", 18, "123@twuc.com", "18888888888");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userStr = objectMapper.writeValueAsString(user);
+        mockMvc.perform(post("/user/register")
+                .content(userStr)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+
+
+    @Test
     void should_not_register_when_gender_is_empty() throws Exception {
         User user = new User("zoom", "", 18, "123@twuc.com", "18888888888");
         ObjectMapper objectMapper = new ObjectMapper();
