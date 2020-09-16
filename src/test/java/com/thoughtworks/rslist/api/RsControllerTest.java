@@ -199,5 +199,17 @@ class RsControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void should_not_add_when_user_is_null() throws Exception {
+        RsEvent rsEvent = new RsEvent("林俊杰发新歌了！", "娱乐", null);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String rsString = objectMapper.writeValueAsString(rsEvent);
+
+        mockMvc.perform(post("/rs/event")
+                .content(rsString)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
 
 }
