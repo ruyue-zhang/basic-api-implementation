@@ -129,4 +129,15 @@ class UserControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void should_not_register_when_phone_not_start_1() throws Exception {
+        User user = new User("zoom", "female", 18, "123@twuc.com", "28888888888");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userStr = objectMapper.writeValueAsString(user);
+        mockMvc.perform(post("/user/register")
+                .content(userStr)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
 }
