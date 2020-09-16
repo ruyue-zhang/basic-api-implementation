@@ -79,7 +79,7 @@ class RsControllerTest {
         String rsString = objectMapper.writeValueAsString(rsEvent);
 
         mockMvc.perform(post("/rs/event").content(rsString).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
         mockMvc.perform(get("/rs/list"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(4)))
@@ -96,7 +96,7 @@ class RsControllerTest {
     @Test
     void should_delete_rs_event_by_index() throws Exception {
         mockMvc.perform(delete("/rs/delete/1"))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         mockMvc.perform(get("/rs/list"))
                 .andExpect(status().isOk())
@@ -116,7 +116,7 @@ class RsControllerTest {
         mockMvc.perform(put("/rs/put/1")
                 .content(changeEventName)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
         mockMvc.perform(get("/rs/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.eventName", is("第一条event")))
@@ -128,7 +128,7 @@ class RsControllerTest {
         mockMvc.perform(put("/rs/put/2")
                 .content(changeKeyWord)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
         mockMvc.perform(get("/rs/2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.eventName", is("第二条事件")))
@@ -140,7 +140,7 @@ class RsControllerTest {
         mockMvc.perform(put("/rs/put/3")
                 .content(changeBoth)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
         mockMvc.perform(get("/rs/3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.eventName", is("第三条event")))
@@ -221,7 +221,7 @@ class RsControllerTest {
         mockMvc.perform(post("/rs/event")
                 .content(rsString)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         assertEquals(1, UserController.userList.size());
     }
@@ -237,7 +237,7 @@ class RsControllerTest {
         mockMvc.perform(post("/rs/event")
                 .content(rsString)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         RsEvent rsEventNew = new RsEvent("研究说明晚睡会秃头！!", "生活", user);
         String rsStringNew = objectMapper.writeValueAsString(rsEventNew);
@@ -245,7 +245,7 @@ class RsControllerTest {
         mockMvc.perform(post("/rs/event")
                 .content(rsStringNew)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         assertEquals(1, UserController.userList.size());
     }

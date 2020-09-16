@@ -27,7 +27,7 @@ class UserControllerTest {
         mockMvc.perform(post("/user/register")
                 .content(userStr)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
     }
 
     @Test
@@ -161,5 +161,4 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
-
 }
