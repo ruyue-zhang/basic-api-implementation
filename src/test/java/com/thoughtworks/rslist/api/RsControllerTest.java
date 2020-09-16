@@ -225,4 +225,28 @@ class RsControllerTest {
 
         assertEquals(1, UserController.userList.size());
     }
+
+    @Test
+    void should_not_add_user_when_user_exist() throws Exception {
+        User user = new User("zhangSan", "male", 25, "666@twuc.com", "18800000000");
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        RsEvent rsEvent = new RsEvent("林俊杰发新歌了!", "娱乐", user);
+        String rsString = objectMapper.writeValueAsString(rsEvent);
+
+        mockMvc.perform(post("/rs/event")
+                .content(rsString)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        RsEvent rsEventNew = new RsEvent("研究说明晚睡会秃头！!", "生活", user);
+        String rsStringNew = objectMapper.writeValueAsString(rsEventNew);
+
+        mockMvc.perform(post("/rs/event")
+                .content(rsStringNew)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        assertEquals(1, UserController.userList.size());
+    }
 }

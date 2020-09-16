@@ -41,7 +41,7 @@ public class RsController {
   public void addRsEvent(@Valid  @RequestBody RsEvent rsEvent) {
     Boolean isExist = false;
     for (User user : UserController.userList) {
-      if (user == rsEvent.getUser()) {
+      if (user.getName().equals(rsEvent.getUser().getName())) {
         isExist = true;
         break;
       }
