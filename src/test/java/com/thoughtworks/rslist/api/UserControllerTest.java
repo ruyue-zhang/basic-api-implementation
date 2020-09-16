@@ -8,11 +8,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.hamcrest.Matchers.hasKey;
 
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -162,5 +163,26 @@ class UserControllerTest {
                 .content(userStr)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void should_get_all_users() throws Exception {
+        User user = new User("xiaowang", "female", 19, "a@thoughtworks.com", "18888888888");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userJson = objectMapper.writeValueAsString(user);
+
+        mockMvc.perform(post("/user/register")
+                .content(userJson)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(header().string("index", String.valueOf(UserController.userList.size() - 1)))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/get/users"))
+                .andExpect(jsonPath("$[0].name", is("xiaowang")))
+                .andExpect(jsonPath("$[0].gender", is("female")))
+                .andExpect(jsonPath("$[0].age", is(19)))
+                .andExpect(jsonPath("$[0].email", is("a@thoughtworks.com")))
+                .andExpect(jsonPath("$[0].phone", is("18888888888")))
+                .andExpect(status().isOk());
     }
 }
