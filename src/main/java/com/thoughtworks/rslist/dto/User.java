@@ -4,13 +4,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 @Data
 @NoArgsConstructor
 public class User {
     @NotEmpty
     private String name;
+    @NotEmpty
     private String gender;
     private Integer age;
     private String email;
