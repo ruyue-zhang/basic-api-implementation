@@ -1,21 +1,21 @@
 package com.thoughtworks.rslist.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-@Data
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class RsEvent {
     public interface WithoutUserView {};
+    public interface WithUserView extends WithoutUserView{};
 
     @NotEmpty
     private String eventName;
@@ -23,11 +23,20 @@ public class RsEvent {
     private String keyWord;
     @NotNull
     @Valid
-    @JsonIgnore
     private User user;
 
-    @JsonView(WithoutUserView.class)
+    @JsonView(WithUserView.class)
     public User getUser() {
         return user;
+    }
+
+    @JsonView(WithoutUserView.class)
+    public String getEventName() {
+        return eventName;
+    }
+
+    @JsonView(WithoutUserView.class)
+    public String getKeyWord() {
+        return keyWord;
     }
 }

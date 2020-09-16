@@ -87,7 +87,7 @@ class RsControllerTest {
         RsEvent rsEvent = new RsEvent("猪肉涨价了", "经济", user);
         ObjectMapper objectMapper = new ObjectMapper();
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        objectMapper.writerWithView(RsEvent.WithoutUserView.class).writeValue(bos, rsEvent);
+        objectMapper.writerWithView(RsEvent.WithUserView.class).writeValue(bos, rsEvent);
 
         mockMvc.perform(post("/rs/event").content(bos.toString()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
@@ -228,7 +228,7 @@ class RsControllerTest {
         RsEvent rsEvent = new RsEvent("林俊杰发新歌了!", "娱乐", user);
         ObjectMapper objectMapper = new ObjectMapper();
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        objectMapper.writerWithView(RsEvent.WithoutUserView.class).writeValue(bos, rsEvent);
+        objectMapper.writerWithView(RsEvent.WithUserView.class).writeValue(bos, rsEvent);
 
         mockMvc.perform(post("/rs/event")
                 .content(bos.toString())
@@ -245,7 +245,7 @@ class RsControllerTest {
 
         RsEvent rsEvent = new RsEvent("林俊杰发新歌了!", "娱乐", user);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        objectMapper.writerWithView(RsEvent.WithoutUserView.class).writeValue(bos, rsEvent);
+        objectMapper.writerWithView(RsEvent.WithUserView.class).writeValue(bos, rsEvent);
 
         mockMvc.perform(post("/rs/event")
                 .content(bos.toString())
@@ -253,7 +253,7 @@ class RsControllerTest {
                 .andExpect(status().isCreated());
 
         RsEvent rsEventNew = new RsEvent("研究说明晚睡会秃头！!", "生活", user);
-        objectMapper.writerWithView(RsEvent.WithoutUserView.class).writeValue(bos, rsEventNew);
+        objectMapper.writerWithView(RsEvent.WithUserView.class).writeValue(bos, rsEventNew);
 
         mockMvc.perform(post("/rs/event")
                 .content(bos.toString())
