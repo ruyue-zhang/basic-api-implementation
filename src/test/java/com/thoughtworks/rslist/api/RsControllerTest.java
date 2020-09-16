@@ -148,7 +148,7 @@ class RsControllerTest {
     }
 
     @Test
-    void should_not_add_when_eventName_is_empty() throws Exception {
+    void should_not_add_when_eventName_is_null() throws Exception {
         User user = new User("zhangSan", "male", 25, "666@twuc.com", "18800000000");
         RsEvent rsEvent = new RsEvent(null, "娱乐", user);
         ObjectMapper objectMapper = new ObjectMapper();
@@ -159,4 +159,6 @@ class RsControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
+
+
 }
