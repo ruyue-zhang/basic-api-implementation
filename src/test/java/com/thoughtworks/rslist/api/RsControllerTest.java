@@ -2,6 +2,7 @@ package com.thoughtworks.rslist.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.dto.RsEvent;
+import com.thoughtworks.rslist.dto.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -35,6 +36,7 @@ class RsControllerTest {
                 .andExpect(jsonPath("$[2].keyWord", is("无分类")));
     }
 
+    @Test
     void should_get_one_rs_event() throws Exception {
         mockMvc.perform(get("/rs/1"))
                 .andExpect(status().isOk())
@@ -70,7 +72,8 @@ class RsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)));
 
-        RsEvent rsEvent = new RsEvent("猪肉涨价了", "经济");
+        User user = new User("zhangSan", "male", 25, "666@twuc.com", "18800000000");
+        RsEvent rsEvent = new RsEvent("猪肉涨价了", "经济", user);
         ObjectMapper objectMapper = new ObjectMapper();
         String rsString = objectMapper.writeValueAsString(rsEvent);
 
@@ -107,7 +110,7 @@ class RsControllerTest {
         RsEvent rsEvent;
         ObjectMapper objectMapper = new ObjectMapper();
 
-        rsEvent = new RsEvent("第一条event", null);
+        rsEvent = new RsEvent("第一条event", null, null);
         String changeEventName = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(put("/rs/put/1")
                 .content(changeEventName)
@@ -119,7 +122,7 @@ class RsControllerTest {
                 .andExpect(jsonPath("$.keyWord", is("无分类")));
 
 
-        rsEvent = new RsEvent(null, "noClassify");
+        rsEvent = new RsEvent(null, "noClassify", null);
         String changeKeyWord = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(put("/rs/put/2")
                 .content(changeKeyWord)
@@ -131,7 +134,7 @@ class RsControllerTest {
                 .andExpect(jsonPath("$.keyWord", is("noClassify")));
 
 
-        rsEvent = new RsEvent("第三条event", "noClassify");
+        rsEvent = new RsEvent("第三条event", "noClassify", null);
         String changeBoth = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(put("/rs/put/3")
                 .content(changeBoth)
