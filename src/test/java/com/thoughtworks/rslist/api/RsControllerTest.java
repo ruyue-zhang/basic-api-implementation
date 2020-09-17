@@ -413,4 +413,33 @@ class RsControllerTest {
         assertEquals("第三条event", resultRsEvent.getEventName());
         assertEquals("zoom", resultRsEvent.getKeyWord());
     }
+
+    @Test
+    void should_not_update_rs_event_when_user_id_not_match() throws Exception {
+        UserEntity userEntity = UserEntity.builder()
+                .name("zhangSan")
+                .gender("female")
+                .age(25)
+                .email("666@twuc.com")
+                .phone("18800000000")
+                .vote(10)
+                .build();
+        userRepository.save(userEntity);
+        RsEventEntity rsEventEntity = RsEventEntity.builder()
+                .eventName("猪肉涨价了")
+                .keyWord("经济")
+                .userId(userEntity.getId())
+                .build();
+        rsEventRepository.save(rsEventEntity);
+
+        RsEvent newRsEvent;
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        newRsEvent = new RsEvent("第一条event", "测试", 3);
+        String changeEventName = objectMapper.writeValueAsString(newRsEvent);
+        mockMvc.perform(put("/rs/{rsEventId}", rsEventEntity.getId())
+                .content(changeEventName)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 }
