@@ -66,4 +66,14 @@ public class UserController {
                 .vote(userEntity.getVote())
                 .build());
     }
+
+    @DeleteMapping("/user/{id}")
+    public ResponseEntity deleteUserById(@PathVariable Integer id) throws InvalidIndexException {
+        Optional<UserEntity> result = userRepository.findById(id);
+        if(!result.isPresent()) {
+            throw new InvalidIndexException("invalid user id");
+        }
+        userRepository.deleteById(id);
+        return ResponseEntity.created(null).build();
+    }
 }

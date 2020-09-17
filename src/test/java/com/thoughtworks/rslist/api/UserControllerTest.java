@@ -21,8 +21,7 @@ import static org.hamcrest.Matchers.hasKey;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -236,6 +235,23 @@ class UserControllerTest {
         mockMvc.perform(get("/user/{id}", userEntity.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", is("zhangSan")));
+    }
 
+    @Test
+    void should_delete_user_info_from_db_by_id() throws Exception {
+        UserEntity userEntity = UserEntity.builder()
+                .name("zhangSan")
+                .gender("female")
+                .age(25)
+                .email("666@twuc.com")
+                .phone("18800000000")
+                .vote(10)
+                .build();
+        userRepository.save(userEntity);
+
+        mockMvc.perform(delete("/user/{id}", userEntity.getId()))
+                .andExpect(status().isCreated());
+        List<UserEntity> userList = userRepository.findAll();
+        assertEquals(0,userList.size());
     }
 }
