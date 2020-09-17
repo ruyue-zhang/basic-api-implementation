@@ -3,6 +3,9 @@ package com.thoughtworks.rslist.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.dto.RsEvent;
 import com.thoughtworks.rslist.dto.User;
+import com.thoughtworks.rslist.entity.UserEntity;
+import com.thoughtworks.rslist.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -11,10 +14,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 
 import static org.hamcrest.Matchers.hasKey;
 
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -24,6 +29,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    UserRepository userRepository;
+
+    @BeforeEach
+    void setUp() {
+        userRepository.deleteAll();
+    }
+
 
     @Test
     void should_register_user() throws Exception {
@@ -33,8 +46,12 @@ class UserControllerTest {
         mockMvc.perform(post("/user/register")
                 .content(userStr)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(header().string("index", String.valueOf(UserController.userList.size() - 1)))
+                .andExpect(header().string("index", String.valueOf("1")))
                 .andExpect(status().isCreated());
+
+        List<UserEntity> users = userRepository.findAll();
+        assertEquals(1, users.size());
+        assertEquals("zoom", users.get(0).getName());
     }
 
     @Test
@@ -202,4 +219,5 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.error", is("invalid user")))
                 .andExpect(status().isBadRequest());
     }
+
 }
