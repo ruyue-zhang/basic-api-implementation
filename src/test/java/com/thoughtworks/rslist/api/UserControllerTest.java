@@ -46,12 +46,17 @@ class UserControllerTest {
         mockMvc.perform(post("/user/register")
                 .content(userStr)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(header().string("index", String.valueOf("1")))
+                .andExpect(header().string("index", "1"))
                 .andExpect(status().isCreated());
 
         List<UserEntity> users = userRepository.findAll();
         assertEquals(1, users.size());
         assertEquals("zoom", users.get(0).getName());
+        assertEquals("female", users.get(0).getGender());
+        assertEquals(18, users.get(0).getAge());
+        assertEquals("123@twuc.com", users.get(0).getEmail());
+        assertEquals("18888888888", users.get(0).getPhone());
+        assertEquals(10, users.get(0).getVote());
     }
 
     @Test
@@ -195,16 +200,13 @@ class UserControllerTest {
         mockMvc.perform(post("/user/register")
                 .content(userJson)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(header().string("index", String.valueOf(UserController.userList.size() - 1)))
+                .andExpect(header().string("index", "1"))
                 .andExpect(status().isCreated());
 
         mockMvc.perform(get("/get/users"))
-                .andExpect(jsonPath("$[0].name", is("xiaowang")))
-                .andExpect(jsonPath("$[0].gender", is("female")))
-                .andExpect(jsonPath("$[0].age", is(19)))
-                .andExpect(jsonPath("$[0].email", is("a@thoughtworks.com")))
-                .andExpect(jsonPath("$[0].phone", is("18888888888")))
                 .andExpect(status().isOk());
+
+        assertEquals(1, userRepository.findAll().size());
     }
 
     @Test
@@ -234,7 +236,12 @@ class UserControllerTest {
 
         mockMvc.perform(get("/user/{id}", userEntity.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name", is("zhangSan")));
+                .andExpect(jsonPath("$.name", is("zhangSan")))
+                .andExpect(jsonPath("$.gender", is("female")))
+                .andExpect(jsonPath("$.age", is(25)))
+                .andExpect(jsonPath("$.email", is("666@twuc.com")))
+                .andExpect(jsonPath("$.phone", is("18800000000")))
+                .andExpect(jsonPath("$.vote", is(10)));
     }
 
     @Test

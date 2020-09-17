@@ -40,7 +40,7 @@ public class UserController {
 
         userRepository.save(userEntity);
         return ResponseEntity.created(null)
-                .header("index", String.valueOf(userEntity.getId()))
+                .header("index", String.valueOf(userRepository.findAll().size()))
                 .build();
     }
 
