@@ -33,7 +33,7 @@ public class RsController {
     if(start == null || end == null) {
       return ResponseEntity.ok().body(rsList);
     }
-    if (start < 1 || end > rsList.size() || end >= start) {
+    if (start < 1 || end > rsList.size() || end < start) {
       throw new InvalidIndexException("invalid request param");
     }
     return ResponseEntity.ok().body(rsList.subList(start - 1, end));
