@@ -6,7 +6,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler({InvalidIndexException.class})
+    @ExceptionHandler({InvalidIndexException.class,
+                        InvalidParamException.class})
     public ResponseEntity<CommentError> handleGlobalException(Exception e) {
         CommentError commentError = new CommentError();
         commentError.setError(e.getMessage());

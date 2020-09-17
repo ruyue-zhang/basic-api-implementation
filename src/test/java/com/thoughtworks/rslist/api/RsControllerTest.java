@@ -13,6 +13,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -282,5 +283,20 @@ class RsControllerTest {
         mockMvc.perform(get("/rs/list?start=1&end=20"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error", is("invalid request param")));
+    }
+
+    @Test
+    void should_return_exception_when_add_rs_event_invalid() throws Exception {
+        User user = new User("zhangSan", "male", 25, "666@twuc.com", "18800000000");
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        RsEvent rsEvent = new RsEvent(null, "娱乐", user);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        objectMapper.writerWithView(RsEvent.WithUserView.class).writeValue(bos, rsEvent);
+        mockMvc.perform(post("/rs/event")
+                .content(bos.toString())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.error", is("invalid param")))
+                .andExpect(status().isBadRequest());
     }
 }

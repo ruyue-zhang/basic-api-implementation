@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.thoughtworks.rslist.dto.RsEvent;
 import com.thoughtworks.rslist.dto.User;
 import com.thoughtworks.rslist.exception.InvalidIndexException;
+import com.thoughtworks.rslist.exception.InvalidParamException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -47,7 +49,10 @@ public class RsController {
   }
 
   @PostMapping("/rs/event")
-  public ResponseEntity addRsEvent(@RequestBody @Valid RsEvent rsEvent) {
+  public ResponseEntity addRsEvent(@RequestBody @Valid RsEvent rsEvent, BindingResult bindingResult) throws InvalidParamException {
+    if (bindingResult.hasErrors()) {
+      throw new InvalidParamException("invalid param");
+    }
     Boolean isExist = false;
     for (User user : UserController.userList) {
       if (user.getName().equals(rsEvent.getUser().getName())) {
