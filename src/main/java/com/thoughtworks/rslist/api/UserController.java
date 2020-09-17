@@ -2,19 +2,18 @@ package com.thoughtworks.rslist.api;
 
 import com.thoughtworks.rslist.dto.User;
 import com.thoughtworks.rslist.entity.UserEntity;
+import com.thoughtworks.rslist.exception.InvalidIndexException;
 import com.thoughtworks.rslist.exception.InvalidParamException;
 import com.thoughtworks.rslist.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class UserController {
@@ -49,5 +48,22 @@ public class UserController {
     public ResponseEntity getAllUser() {
         return ResponseEntity.ok()
                 .body(userList);
+    }
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable Integer id) throws InvalidIndexException {
+        Optional<UserEntity> result = userRepository.findById(id);
+        if(!result.isPresent()) {
+            throw new InvalidIndexException("invalid user id");
+        }
+        UserEntity userEntity = result.get();
+        return ResponseEntity.ok(User.builder()
+                .name(userEntity.getName())
+                .gender(userEntity.getGender())
+                .age(userEntity.getAge())
+                .email(userEntity.getEmail())
+                .phone(userEntity.getPhone())
+                .vote(userEntity.getVote())
+                .build());
     }
 }

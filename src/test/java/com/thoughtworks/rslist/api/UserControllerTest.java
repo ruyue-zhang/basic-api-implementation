@@ -1,5 +1,6 @@
 package com.thoughtworks.rslist.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.dto.RsEvent;
 import com.thoughtworks.rslist.dto.User;
@@ -220,4 +221,21 @@ class UserControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void return_user_info_when_find_by_id() throws Exception {
+        UserEntity userEntity = UserEntity.builder()
+                .name("zhangSan")
+                .gender("female")
+                .age(25)
+                .email("666@twuc.com")
+                .phone("18800000000")
+                .vote(10)
+                .build();
+        userRepository.save(userEntity);
+
+        mockMvc.perform(get("/user/{id}", userEntity.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", is("zhangSan")));
+
+    }
 }
