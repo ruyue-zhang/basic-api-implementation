@@ -22,12 +22,11 @@ public class RsEvent {
     @NotEmpty
     private String keyWord;
     @NotNull
-    @Valid
-    private User user;
+    private int userId;
 
     @JsonView(WithUserView.class)
-    public User getUser() {
-        return user;
+    public int getUserId() {
+        return userId;
     }
 
     @JsonView(WithoutUserView.class)
