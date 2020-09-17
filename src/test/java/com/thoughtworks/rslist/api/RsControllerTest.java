@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -355,8 +356,61 @@ class RsControllerTest {
                 .content(bos.toString())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
- 
+
         List<RsEventEntity> rsEvents = rsEventRepository.findAll();
         assertEquals(0, rsEvents.size());
+    }
+
+    @Test
+    void should_update_rs_event_when_user_id_match() throws Exception {
+        UserEntity userEntity = UserEntity.builder()
+                .name("zhangSan")
+                .gender("female")
+                .age(25)
+                .email("666@twuc.com")
+                .phone("18800000000")
+                .vote(10)
+                .build();
+        userRepository.save(userEntity);
+        RsEventEntity rsEventEntity = RsEventEntity.builder()
+                .eventName("猪肉涨价了")
+                .keyWord("经济")
+                .userId(userEntity.getId())
+                .build();
+        rsEventRepository.save(rsEventEntity);
+
+        RsEvent newRsEvent;
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        newRsEvent = new RsEvent("第一条event", null, userEntity.getId());
+        String changeEventName = objectMapper.writeValueAsString(newRsEvent);
+        mockMvc.perform(put("/rs/{rsEventId}", rsEventEntity.getId())
+                .content(changeEventName)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+        RsEventEntity resultRsEvent = rsEventRepository.findById(rsEventEntity.getId()).get();
+        assertEquals("第一条event", resultRsEvent.getEventName());
+        assertEquals("经济", resultRsEvent.getKeyWord());
+
+        newRsEvent = new RsEvent(null, "noClassify", userEntity.getId());
+        String changeKeyWord = objectMapper.writeValueAsString(newRsEvent);
+        mockMvc.perform(put("/rs/{rsEventId}", rsEventEntity.getId())
+                .content(changeKeyWord)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+        resultRsEvent = rsEventRepository.findById(rsEventEntity.getId()).get();
+        assertEquals("第一条event", resultRsEvent.getEventName());
+        assertEquals("noClassify", resultRsEvent.getKeyWord());
+
+
+        newRsEvent = new RsEvent("第三条event", "zoom", userEntity.getId());
+        String changeBoth = objectMapper.writeValueAsString(newRsEvent);
+        mockMvc.perform(put("/rs/{rsEventId}", rsEventEntity.getId())
+                .content(changeBoth)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+        resultRsEvent = rsEventRepository.findById(rsEventEntity.getId()).get();
+        assertEquals("第三条event", resultRsEvent.getEventName());
+        assertEquals("zoom", resultRsEvent.getKeyWord());
     }
 }

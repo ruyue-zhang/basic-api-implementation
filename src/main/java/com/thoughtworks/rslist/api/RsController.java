@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class RsController {
@@ -79,11 +80,20 @@ public class RsController {
     return ResponseEntity.created(null).build();
   }
 
-//  @PutMapping("/rs/put/{index}")
-//  public ResponseEntity updateRsByIndex(@PathVariable int index, @RequestBody RsEvent rsEvent) {
-//    String eventName = rsEvent.getEventName() == null ? rsList.get(index - 1).getEventName() : rsEvent.getEventName();
-//    String keyWord = rsEvent.getKeyWord() == null ? rsList.get(index- 1).getKeyWord() : rsEvent.getKeyWord();
-//    rsList.set(index - 1, new RsEvent(eventName, keyWord, rsEvent.getUser()));
-//    return ResponseEntity.created(null).build();
-//  }
+  @PutMapping("/rs/{rsEventId}")
+  public ResponseEntity updateRsByIndex(@PathVariable int rsEventId, @RequestBody RsEvent rsEvent) {
+    RsEventEntity rsEventEntity = rsEventRepository.findById(rsEventId).get();
+    if(rsEventEntity.getUserId() != rsEvent.getUserId()) {
+      return ResponseEntity.badRequest().build();
+    }
+    String eventName = rsEvent.getEventName() == null ? rsEventEntity.getEventName() : rsEvent.getEventName();
+    String keyWord = rsEvent.getKeyWord() == null ? rsEventEntity.getKeyWord() : rsEvent.getKeyWord();
+    int userId = rsEventEntity.getUserId();
+
+    rsEventEntity.setEventName(eventName);
+    rsEventEntity.setKeyWord(keyWord);
+    rsEventEntity.setUserId(userId);
+    rsEventRepository.save(rsEventEntity);
+    return ResponseEntity.created(null).build();
+  }
 }
