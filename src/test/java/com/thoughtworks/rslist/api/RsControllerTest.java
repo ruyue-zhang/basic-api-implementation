@@ -355,7 +355,7 @@ class RsControllerTest {
                 .content(bos.toString())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
-
+ 
         List<RsEventEntity> rsEvents = rsEventRepository.findAll();
         assertEquals(0, rsEvents.size());
     }

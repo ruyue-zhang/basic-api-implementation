@@ -4,12 +4,15 @@ import com.thoughtworks.rslist.dto.User;
 import com.thoughtworks.rslist.entity.UserEntity;
 import com.thoughtworks.rslist.exception.InvalidIndexException;
 import com.thoughtworks.rslist.exception.InvalidParamException;
+import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +22,11 @@ import java.util.Optional;
 public class UserController {
     public static List<User>  userList = new ArrayList<>();
     final UserRepository userRepository;
+    final RsEventRepository rsEventRepository;
 
-    public UserController(UserRepository userRepository) {
+    public UserController(UserRepository userRepository, RsEventRepository rsEventRepository) {
         this.userRepository = userRepository;
+        this.rsEventRepository = rsEventRepository;
     }
 
     @PostMapping("/user/register")
@@ -67,6 +72,7 @@ public class UserController {
                 .build());
     }
 
+    @Transactional
     @DeleteMapping("/user/{id}")
     public ResponseEntity deleteUserById(@PathVariable Integer id) throws InvalidIndexException {
         Optional<UserEntity> result = userRepository.findById(id);
@@ -74,6 +80,7 @@ public class UserController {
             throw new InvalidIndexException("invalid user id");
         }
         userRepository.deleteById(id);
-        return ResponseEntity.created(null).build();
+        rsEventRepository.deleteAllByUserId(id);
+        return ResponseEntity.noContent().build();
     }
 }

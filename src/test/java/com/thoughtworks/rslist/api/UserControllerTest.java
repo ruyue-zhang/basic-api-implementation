@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.dto.RsEvent;
 import com.thoughtworks.rslist.dto.User;
+import com.thoughtworks.rslist.entity.RsEventEntity;
 import com.thoughtworks.rslist.entity.UserEntity;
+import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,10 +33,13 @@ class UserControllerTest {
     private MockMvc mockMvc;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    RsEventRepository rsEventRepository;
 
     @BeforeEach
     void setUp() {
         userRepository.deleteAll();
+        rsEventRepository.deleteAll();
     }
 
 
@@ -260,5 +265,32 @@ class UserControllerTest {
                 .andExpect(status().isCreated());
         List<UserEntity> userList = userRepository.findAll();
         assertEquals(0,userList.size());
+    }
+
+    @Test
+    void should_delete_rsEvent_When_delete_user() throws Exception {
+        UserEntity userEntity = UserEntity.builder()
+                .name("zhangSan")
+                .gender("female")
+                .age(25)
+                .email("666@twuc.com")
+                .phone("18800000000")
+                .vote(10)
+                .build();
+        userRepository.save(userEntity);
+
+        RsEventEntity rsEventEntity = RsEventEntity.builder()
+                .eventName("多喝水的好处")
+                .keyWord("健康")
+                .userId(userEntity.getId())
+                .build();
+        rsEventRepository.save(rsEventEntity);
+
+        mockMvc.perform(delete("/user/{id}", userEntity.getId()))
+                .andExpect(status().isNoContent());
+        List<UserEntity> userList = userRepository.findAll();
+        List<RsEventEntity> rsEventList = rsEventRepository.findAll();
+        assertEquals(0,userList.size());
+        assertEquals(0,rsEventList.size());
     }
 }
