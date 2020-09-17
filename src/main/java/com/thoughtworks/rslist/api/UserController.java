@@ -80,7 +80,6 @@ public class UserController {
             throw new InvalidIndexException("invalid user id");
         }
         userRepository.deleteById(id);
-        rsEventRepository.deleteAllByUserId(id);
         return ResponseEntity.noContent().build();
     }
 }
