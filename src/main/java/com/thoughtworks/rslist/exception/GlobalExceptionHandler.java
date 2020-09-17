@@ -6,15 +6,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler({InvalidIndexException.class,
-                       IndexOutOfBoundsException.class})
+    @ExceptionHandler({InvalidIndexException.class})
     public ResponseEntity<CommentError> handleGlobalException(Exception e) {
         CommentError commentError = new CommentError();
-        if(e instanceof InvalidIndexException) {
-            commentError.setError("invalid index");
-        } else if(e instanceof IndexOutOfBoundsException) {
-            commentError.setError("invalid request param");
-        }
+        commentError.setError(e.getMessage());
         return ResponseEntity.badRequest().body(commentError);
     }
 }

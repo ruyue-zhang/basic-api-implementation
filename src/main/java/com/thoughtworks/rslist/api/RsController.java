@@ -27,12 +27,12 @@ public class RsController {
   @JsonView(RsEvent.WithoutUserView.class)
   @GetMapping("/rs/list")
   public ResponseEntity<List<RsEvent>> getRsEventByRange(@RequestParam(required = false) Integer start,
-                                                        @RequestParam(required = false) Integer end) {
+                                                        @RequestParam(required = false) Integer end) throws InvalidIndexException {
     if(start == null || end == null) {
       return ResponseEntity.ok().body(rsList);
     }
     if (start < 1 || end > rsList.size() || end >= start) {
-      throw new IndexOutOfBoundsException();
+      throw new InvalidIndexException("invalid request param");
     }
     return ResponseEntity.ok().body(rsList.subList(start - 1, end));
   }
@@ -41,7 +41,7 @@ public class RsController {
   @GetMapping("/rs/{index}")
   public ResponseEntity<RsEvent> getRsEvent(@PathVariable int index) throws InvalidIndexException {
     if(index > rsList.size()) {
-      throw new InvalidIndexException();
+      throw new InvalidIndexException("invalid index");
     }
     return ResponseEntity.ok().body(rsList.get(index -1));
   }
