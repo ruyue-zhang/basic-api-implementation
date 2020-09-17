@@ -1,6 +1,7 @@
 package com.thoughtworks.rslist.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thoughtworks.rslist.dto.RsEvent;
 import com.thoughtworks.rslist.dto.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.io.ByteArrayOutputStream;
+
 import static org.hamcrest.Matchers.hasKey;
 
 import static org.hamcrest.Matchers.*;
@@ -184,5 +188,18 @@ class UserControllerTest {
                 .andExpect(jsonPath("$[0].email", is("a@thoughtworks.com")))
                 .andExpect(jsonPath("$[0].phone", is("18888888888")))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void should_return_exception_when_add_user_invalid() throws Exception {
+        User user = new User("zhangSan7777", "male", 25, "666@twuc.com", "18800000000");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userJson = objectMapper.writeValueAsString(user);
+
+        mockMvc.perform(post("/user/register")
+                .content(userJson)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.error", is("invalid user")))
+                .andExpect(status().isBadRequest());
     }
 }

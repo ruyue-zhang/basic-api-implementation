@@ -1,7 +1,9 @@
 package com.thoughtworks.rslist.api;
 
 import com.thoughtworks.rslist.dto.User;
+import com.thoughtworks.rslist.exception.InvalidParamException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +18,10 @@ public class UserController {
     public static List<User>  userList = new ArrayList<>();
 
     @PostMapping("/user/register")
-    public ResponseEntity register(@Valid @RequestBody User user) {
+    public ResponseEntity register(@Valid @RequestBody User user, BindingResult bindingResult) throws InvalidParamException {
+        if(bindingResult.hasErrors()) {
+            throw new InvalidParamException("invalid user");
+        }
         userList.add(user);
         return ResponseEntity.created(null)
                 .header("index", String.valueOf(userList.size() - 1))
