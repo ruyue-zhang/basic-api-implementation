@@ -269,4 +269,11 @@ class RsControllerTest {
 
         assertEquals(1, UserController.userList.size());
     }
+
+    @Test
+    void should_return_exception_when_input_invalid_index() throws Exception {
+        mockMvc.perform(get("/rs/10"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error", is("invalid index")));
+    }
 }
