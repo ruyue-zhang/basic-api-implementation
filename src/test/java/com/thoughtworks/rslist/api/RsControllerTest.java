@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
@@ -34,6 +35,7 @@ class RsControllerTest {
     UserRepository userRepository;
     @Autowired
     RsEventRepository rsEventRepository;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     LocalDateTime voteTime;
     @BeforeEach
     void setUp() {
@@ -425,7 +427,7 @@ class RsControllerTest {
         Vote vote = Vote.builder()
                 .userId(userEntity.getId())
                 .voteNum(5)
-//                .voteTime(voteTime)
+                .voteTime(voteTime)
                 .build();
         ObjectMapper objectMapper = new ObjectMapper();
         String voteJson = objectMapper.writeValueAsString(vote);
@@ -458,7 +460,7 @@ class RsControllerTest {
         Vote vote = Vote.builder()
                 .userId(userEntity.getId())
                 .voteNum(11)
-//                .voteTime(voteTime)
+                .voteTime(voteTime)
                 .build();
         ObjectMapper objectMapper = new ObjectMapper();
         String voteJson = objectMapper.writeValueAsString(vote);
