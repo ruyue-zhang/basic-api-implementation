@@ -262,7 +262,8 @@ class UserControllerTest {
         userRepository.save(userEntity);
 
         mockMvc.perform(delete("/user/{id}", userEntity.getId()))
-                .andExpect(status().isCreated());
+                .andExpect(status().isNoContent());
+
         List<UserEntity> userList = userRepository.findAll();
         assertEquals(0,userList.size());
     }

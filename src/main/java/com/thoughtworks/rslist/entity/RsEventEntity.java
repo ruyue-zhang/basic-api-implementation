@@ -21,4 +21,5 @@ public class RsEventEntity {
     private String eventName;
     private String keyWord;
     private int userId;
+    private int voteNum = 0;
 }

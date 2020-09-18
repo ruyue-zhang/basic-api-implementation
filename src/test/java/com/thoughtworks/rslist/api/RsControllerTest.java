@@ -2,7 +2,7 @@ package com.thoughtworks.rslist.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.dto.RsEvent;
-import com.thoughtworks.rslist.dto.User;
+import com.thoughtworks.rslist.dto.Vote;
 import com.thoughtworks.rslist.entity.RsEventEntity;
 import com.thoughtworks.rslist.entity.UserEntity;
 import com.thoughtworks.rslist.repository.RsEventRepository;
@@ -18,11 +18,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-
-import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -37,8 +34,10 @@ class RsControllerTest {
     UserRepository userRepository;
     @Autowired
     RsEventRepository rsEventRepository;
+    LocalDateTime voteTime;
     @BeforeEach
     void setUp() {
+        voteTime = LocalDateTime.now();
         userRepository.deleteAll();
         rsEventRepository.deleteAll();
     }
@@ -441,5 +440,38 @@ class RsControllerTest {
                 .content(changeEventName)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void should_vote_rs_event_when_user_vote_num_more_than_curr_vote_num() throws Exception {
+        UserEntity userEntity = UserEntity.builder()
+                .name("zhangSan")
+                .gender("female")
+                .age(25)
+                .email("666@twuc.com")
+                .phone("18800000000")
+                .vote(10)
+                .build();
+        userRepository.save(userEntity);
+        RsEventEntity rsEventEntity = RsEventEntity.builder()
+                .eventName("猪肉涨价了")
+                .keyWord("经济")
+                .userId(userEntity.getId())
+                .build();
+        rsEventRepository.save(rsEventEntity);
+
+        Vote vote = Vote.builder()
+                .userId(userEntity.getId())
+                .voteNum(5)
+//                .voteTime(voteTime)
+                .build();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String voteJson = objectMapper.writeValueAsString(vote);
+
+        mockMvc.perform(post("/rs/vote/{rsEventId}", rsEventEntity.getId())
+                .content(voteJson)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+        assertEquals(5, userRepository.findById(userEntity.getId()).get().getVote());
     }
 }

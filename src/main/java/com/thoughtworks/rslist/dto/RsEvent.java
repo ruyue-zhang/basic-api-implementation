@@ -23,6 +23,13 @@ public class RsEvent {
     private String keyWord;
     @NotNull
     private int userId;
+    private int voteNum = 0;
+
+    public RsEvent(@NotEmpty String eventName, @NotEmpty String keyWord, @NotNull int userId) {
+        this.eventName = eventName;
+        this.keyWord = keyWord;
+        this.userId = userId;
+    }
 
     @JsonView(WithUserView.class)
     public int getUserId() {

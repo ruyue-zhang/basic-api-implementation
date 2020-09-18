@@ -72,7 +72,6 @@ public class UserController {
                 .build());
     }
 
-    @Transactional
     @DeleteMapping("/user/{id}")
     public ResponseEntity deleteUserById(@PathVariable Integer id) throws InvalidIndexException {
         Optional<UserEntity> result = userRepository.findById(id);
