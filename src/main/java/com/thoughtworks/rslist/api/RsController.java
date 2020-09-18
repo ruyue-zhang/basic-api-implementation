@@ -14,6 +14,7 @@ import com.thoughtworks.rslist.repository.UserRepository;
 import com.thoughtworks.rslist.repository.VoteRepository;
 import com.thoughtworks.rslist.service.RsEventService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 public class RsController {
@@ -29,7 +31,6 @@ public class RsController {
   final RsEventRepository rsEventRepository;
   final RsEventService rsEventService;
   final VoteRepository voteRepository;
-  private final List<RsEvent> rsList = initRsList();
 
   public RsController(RsEventRepository rsEventRepository, UserRepository userRepository, RsEventService rsEventService, VoteRepository voteRepository) {
     this.rsEventRepository = rsEventRepository;
@@ -43,25 +44,48 @@ public class RsController {
   }
 
   @JsonView(RsEvent.WithoutUserView.class)
+  @ResponseStatus(code = HttpStatus.OK)
   @GetMapping("/rs/list")
-  public ResponseEntity<List<RsEvent>> getRsEventByRange(@RequestParam(required = false) Integer start,
+  public List<RsEvent> getRsEventByRange(@RequestParam(required = false) Integer start,
                                                         @RequestParam(required = false) Integer end) throws InvalidIndexException {
     if(start == null || end == null) {
-      return ResponseEntity.ok().body(rsList);
+      return rsEventRepository.findAll().stream().map(rsEventEntity -> RsEvent.builder()
+              .eventName(rsEventEntity.getEventName())
+              .keyWord(rsEventEntity.getKeyWord())
+              .userId(rsEventEntity.getUserId())
+              .voteNum(rsEventEntity.getVoteNum())
+              .build()
+      ).collect(Collectors.toList());
     }
-    if (start < 1 || end > rsList.size() || end < start) {
+    if (start < 1 || end < start) {
       throw new InvalidIndexException("invalid request param");
     }
-    return ResponseEntity.ok().body(rsList.subList(start - 1, end));
+    Optional<RsEventEntity> endRsEvent = rsEventRepository.findById(end);
+    if(!endRsEvent.isPresent()) {
+      throw new InvalidIndexException("invalid request param");
+    }
+    return rsEventRepository.findByIdBetween(start, end).stream().map(rsEventEntity -> RsEvent.builder()
+            .eventName(rsEventEntity.getEventName())
+            .keyWord(rsEventEntity.getKeyWord())
+            .userId(rsEventEntity.getUserId())
+            .voteNum(rsEventEntity.getVoteNum())
+            .build()
+    ).collect(Collectors.toList());
   }
 
+  @ResponseStatus(code = HttpStatus.OK)
   @JsonView(RsEvent.WithoutUserView.class)
-  @GetMapping("/rs/{index}")
-  public ResponseEntity<RsEvent> getRsEvent(@PathVariable int index) throws InvalidIndexException {
-    if(index > rsList.size()) {
+  @GetMapping("/rs/{id}")
+  public RsEvent getRsEvent(@PathVariable int id) throws InvalidIndexException {
+    Optional<RsEventEntity> rsEventEntity = rsEventRepository.findById(id);
+    if(!rsEventEntity.isPresent()) {
       throw new InvalidIndexException("invalid index");
     }
-    return ResponseEntity.ok().body(rsList.get(index -1));
+    return RsEvent.builder()
+            .eventName(rsEventEntity.get().getEventName())
+            .keyWord(rsEventEntity.get().getKeyWord())
+            .userId(rsEventEntity.get().getUserId())
+            .build();
   }
 
   @PostMapping("/rs/event")
@@ -83,9 +107,9 @@ public class RsController {
             .build();
   }
 
-  @DeleteMapping("/rs/delete/{index}")
-  public ResponseEntity deleteRsEvent(@PathVariable int index) {
-    rsList.remove(index - 1);
+  @DeleteMapping("/rs/delete/{id}")
+  public ResponseEntity deleteRsEvent(@PathVariable int id) {
+    rsEventRepository.deleteById(id);
     return ResponseEntity.created(null).build();
   }
 
