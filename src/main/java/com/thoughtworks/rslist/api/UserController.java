@@ -6,21 +6,19 @@ import com.thoughtworks.rslist.exception.InvalidIndexException;
 import com.thoughtworks.rslist.exception.InvalidParamException;
 import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 public class UserController {
-    public static List<User>  userList = new ArrayList<>();
     final UserRepository userRepository;
     final RsEventRepository rsEventRepository;
 
@@ -49,10 +47,18 @@ public class UserController {
                 .build();
     }
 
+    @ResponseStatus(code = HttpStatus.OK)
     @GetMapping("/get/users")
-    public ResponseEntity getAllUser() {
-        return ResponseEntity.ok()
-                .body(userList);
+    public List<User> getAllUser() {
+        return userRepository.findAll().stream().map(userEntity -> User.builder()
+                .name(userEntity.getName())
+                .gender(userEntity.getGender())
+                .age(userEntity.getAge())
+                .email(userEntity.getEmail())
+                .phone(userEntity.getPhone())
+                .vote(userEntity.getVote())
+                .build()
+        ).collect(Collectors.toList());
     }
 
     @GetMapping("/user/{id}")

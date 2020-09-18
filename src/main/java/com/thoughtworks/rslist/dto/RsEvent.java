@@ -3,7 +3,6 @@ package com.thoughtworks.rslist.dto;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.*;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 

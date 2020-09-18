@@ -3,7 +3,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -16,10 +15,4 @@ public class Vote {
     private int rsEventId = 0;
     private LocalDateTime voteTime;
     private int voteNum;
-
-    public Vote(int userId, LocalDateTime voteTime, int voteNum) {
-        this.userId = userId;
-        this.voteTime = voteTime;
-        this.voteNum = voteNum;
-    }
 }
