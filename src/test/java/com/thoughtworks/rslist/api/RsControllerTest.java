@@ -474,4 +474,37 @@ class RsControllerTest {
                 .andExpect(status().isCreated());
         assertEquals(5, userRepository.findById(userEntity.getId()).get().getVote());
     }
+
+    @Test
+    void should_return_bad_request_when_user_vote_num_less_than_curr_vote_num() throws Exception {
+        UserEntity userEntity = UserEntity.builder()
+                .name("zhangSan")
+                .gender("female")
+                .age(25)
+                .email("666@twuc.com")
+                .phone("18800000000")
+                .vote(10)
+                .build();
+        userRepository.save(userEntity);
+        RsEventEntity rsEventEntity = RsEventEntity.builder()
+                .eventName("猪肉涨价了")
+                .keyWord("经济")
+                .userId(userEntity.getId())
+                .build();
+        rsEventRepository.save(rsEventEntity);
+
+        Vote vote = Vote.builder()
+                .userId(userEntity.getId())
+                .voteNum(11)
+//                .voteTime(voteTime)
+                .build();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String voteJson = objectMapper.writeValueAsString(vote);
+
+        mockMvc.perform(post("/rs/vote/{rsEventId}", rsEventEntity.getId())
+                .content(voteJson)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        assertEquals(10, userRepository.findById(userEntity.getId()).get().getVote());
+    }
 }

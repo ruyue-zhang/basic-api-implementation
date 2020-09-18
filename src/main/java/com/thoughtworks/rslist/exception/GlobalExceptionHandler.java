@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler({InvalidIndexException.class,
-                        InvalidParamException.class})
+                        InvalidParamException.class,
+                        RuntimeException.class})
     public ResponseEntity<CommentError> handleGlobalException(Exception e) {
         Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
         logger.error("ERROR IS {} : {}", e.getClass(), e.getMessage());
