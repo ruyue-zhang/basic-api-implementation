@@ -41,7 +41,7 @@ public class RsController {
 
   @JsonView(RsEvent.WithoutUserView.class)
   @ResponseStatus(code = HttpStatus.OK)
-  @GetMapping("/rs/list")
+  @GetMapping("/rs/events")
   public List<RsEvent> getRsEventByRange(@RequestParam(required = false) Integer start,
                                                         @RequestParam(required = false) Integer end) throws InvalidIndexException {
     if(start == null || end == null) {
@@ -71,7 +71,7 @@ public class RsController {
 
   @ResponseStatus(code = HttpStatus.OK)
   @JsonView(RsEvent.WithoutUserView.class)
-  @GetMapping("/rs/{id}")
+  @GetMapping("/rs/event/{id}")
   public RsEvent getRsEvent(@PathVariable int id) throws InvalidIndexException {
     Optional<RsEventEntity> rsEventEntity = rsEventRepository.findById(id);
     if(!rsEventEntity.isPresent()) {
@@ -103,15 +103,15 @@ public class RsController {
             .build();
   }
 
-  @DeleteMapping("/rs/delete/{id}")
+  @DeleteMapping("/rs/event/{id}")
   public ResponseEntity deleteRsEvent(@PathVariable int id) {
     rsEventRepository.deleteById(id);
     return ResponseEntity.created(null).build();
   }
 
-  @PutMapping("/rs/{rsEventId}")
-  public ResponseEntity updateRsByIndex(@PathVariable int rsEventId, @RequestBody RsEvent rsEvent) {
-    RsEventEntity rsEventEntity = rsEventRepository.findById(rsEventId).get();
+  @PutMapping("/rs/event/{id}")
+  public ResponseEntity updateRsByIndex(@PathVariable int id, @RequestBody RsEvent rsEvent) {
+    RsEventEntity rsEventEntity = rsEventRepository.findById(id).get();
     if(rsEventEntity.getUserId() != rsEvent.getUserId()) {
       return ResponseEntity.badRequest().build();
     }
@@ -126,9 +126,9 @@ public class RsController {
     return ResponseEntity.created(null).build();
   }
 
-  @PostMapping("/rs/vote/{rsEventId}")
-  public ResponseEntity vote(@PathVariable int rsEventId, @RequestBody Vote vote) throws InvalidParamException {
-    rsEventService.vote(rsEventId, vote);
+  @PostMapping("/rs/{id}/vote")
+  public ResponseEntity vote(@PathVariable int id, @RequestBody Vote vote) throws InvalidParamException {
+    rsEventService.vote(id, vote);
     return ResponseEntity.created(null)
             .build();
   }

@@ -27,7 +27,7 @@ public class UserController {
         this.rsEventRepository = rsEventRepository;
     }
 
-    @PostMapping("/user/register")
+    @PostMapping("/user")
     public ResponseEntity register(@Valid @RequestBody User user, BindingResult bindingResult) throws InvalidParamException {
         if(bindingResult.hasErrors()) {
             throw new InvalidParamException("invalid user");
@@ -48,7 +48,7 @@ public class UserController {
     }
 
     @ResponseStatus(code = HttpStatus.OK)
-    @GetMapping("/get/users")
+    @GetMapping("/users")
     public List<User> getAllUser() {
         return userRepository.findAll().stream().map(userEntity -> User.builder()
                 .name(userEntity.getName())
